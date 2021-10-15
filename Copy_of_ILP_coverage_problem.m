@@ -7,6 +7,12 @@ l_end = 50;
 r = [20, 5];
 R = [40, 20];
 
+% l = [80, 120, 190, 250, 310, 370, 460];
+% l_end = 500;
+% R = [100, 120, 120, 120, 100];
+% %
+% r = [90, 60,  100, 90, 100];
+
 n = length(l);
 m = length(r);
 %% objective function
@@ -50,18 +56,32 @@ m = length(r);
 %% Matrix preparation
 f = table2array(T);
 intcon = 1 : width(T);
+% % linear inequality constraints.
+% total_A = [A_7a; A_7b; A_8a; A_8b; A_9a; A_9b; ...
+%     A_10a; A_10b; A_11a; A_11b; A_10c];
+% A = table2array(total_A);
+% 
+% b = [b_7a; b_7b; b_8a; b_8b; b_9a; b_9b; ...
+%     b_10a; b_10b; b_11a; b_11b; b_10c]; 
+% 
+% % linear equality constraints.
+% total_Aeq = [A_7; A_7h; A_12];
+% Aeq = table2array(total_Aeq);
+% beq = [b_7; b_7h; b_12;];
+
 % linear inequality constraints.
 total_A = [A_7a; A_7b; A_8a; A_8b; A_9a; A_9b; ...
-    A_10a; A_10b; A_11a; A_11b; A_10c];
+     A_11a; A_11b; A_10c];
 A = table2array(total_A);
 
 b = [b_7a; b_7b; b_8a; b_8b; b_9a; b_9b; ...
-    b_10a; b_10b; b_11a; b_11b; b_10c]; 
+     b_11a; b_11b; b_10c]; 
 
 % linear equality constraints.
-total_Aeq = [A_7; A_7h; A_12];
+total_Aeq = [A_7; A_7h; A_10a; A_10b; A_12];
 Aeq = table2array(total_Aeq);
-beq = [b_7; b_7h; b_12;];
+beq = [b_7; b_7h; b_10a; b_10b; b_12;];
+
 
 % bound constraints.
 total_AVarName = total_A.Properties.VariableNames;

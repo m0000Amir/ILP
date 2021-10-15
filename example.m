@@ -1,4 +1,4 @@
-function ILP_coverage_problem()
+function example()
 tic
 %% Input Data
 % 2x3
@@ -6,6 +6,7 @@ l = [20, 30, 40];
 l_end = 50;
 r = [20, 5];
 R = [40, 20];
+D = [[inf, 20];[30, inf]];
 
 n = length(l);
 m = length(r);
@@ -50,18 +51,32 @@ m = length(r);
 %% Matrix preparation
 f = table2array(T);
 intcon = 1 : width(T);
+% % linear inequality constraints.
+% total_A = [A_7a; A_7b; A_8a; A_8b; A_9a; A_9b; ...
+%     A_10a; A_10b; A_11a; A_11b; A_10c];
+% A = table2array(total_A);
+% 
+% b = [b_7a; b_7b; b_8a; b_8b; b_9a; b_9b; ...
+%     b_10a; b_10b; b_11a; b_11b; b_10c]; 
+% 
+% % linear equality constraints.
+% total_Aeq = [A_7; A_7h; A_12];
+% Aeq = table2array(total_Aeq);
+% beq = [b_7; b_7h; b_12;];
+
 % linear inequality constraints.
 total_A = [A_7a; A_7b; A_8a; A_8b; A_9a; A_9b; ...
-    A_10a; A_10b; A_11a; A_11b; A_10c];
+     A_11a; A_11b; A_10c];
 A = table2array(total_A);
 
 b = [b_7a; b_7b; b_8a; b_8b; b_9a; b_9b; ...
-    b_10a; b_10b; b_11a; b_11b; b_10c]; 
+     b_11a; b_11b; b_10c]; 
 
 % linear equality constraints.
-total_Aeq = [A_7; A_7h; A_12];
+total_Aeq = [A_7; A_7h; A_10a; A_10b; A_12];
 Aeq = table2array(total_Aeq);
-beq = [b_7; b_7h; b_12;];
+beq = [b_7; b_7h; b_10a; b_10b; b_12;];
+
 
 % bound constraints.
 total_AVarName = total_A.Properties.VariableNames;
@@ -108,17 +123,42 @@ for i = 0 : n + 1
 end
 f = [f, 0 * ones(1,n + 2)];
 
-%% zijk
+% %% zijk
+% index_place = [0, 1 : n, n + 1];
+% Zname = {};
+% for i = 1 : n
+%     for j = 1 : m
+%         for k = 0 : n + 1
+%             if i ~= k
+%                 Zname = [
+%                     Zname, ['z', num2str(i), '_', ... 
+%                     num2str(j), '_', num2str(k)]
+%                     ];                
+%             end
+%         end
+%     end
+% end
+% 
+% f = [f, 0*ones(1,length(Zname))];
+
+%% ziqwk (Sq is on i place and Sw is on k place)
+
+
 index_place = [0, 1 : n, n + 1];
 Zname = {};
 for i = 1 : n
-    for j = 1 : m
-        for k = 0 : n + 1
-            if i ~= k
-                Zname = [
-                    Zname, ['z', num2str(i), '_', ... 
-                    num2str(j), '_', num2str(k)]
-                    ];                
+    for q = 1 : m
+        for w = 1 : m
+            if w ~= q
+                for k = 0 : n + 1
+                    if i ~= k
+                        Zname = [
+                            Zname, ['z', num2str(i), '_', ...
+                            num2str(q), '_', num2str(w), '_', ...
+                            num2str(k)]
+                            ];                
+                    end
+                end
             end
         end
     end
