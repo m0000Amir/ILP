@@ -12,14 +12,26 @@ m = length(r);
 %% ADD Inequality conditions
 
 %% condition 7Ю,А
+
+% Значения покрытий не превышают радиус покрытия станции, размещенной в 
+% точке $a_i$, и равны 0, если в точке $a_i$  нет станции:
+
 [A_7a, b_7a] = add_condition_7ab(T, r, 'plus', n, m);
 [A_7b, b_7b] = add_condition_7ab(T, r, 'minus', n, m);
 
+
 %% Condition 8Ю,А
+
+% Общая область покрытия между любыми двумя точками $a_i$ и $a_k$, где 
+% расположены станции, не может превышать расстояние между этими точками.
+
 [A_8a, b_8a] = add_condition_8ab(T, l, l_end, n, 'a');
 [A_8b, b_8b] = add_condition_8ab(T, l, l_end, n, 'b');
 
 %% Condition (9Ю, 9А)
+
+% Станции должны быть размещены в обеих точках $a_i$ и $a_k$
+
 [A_9a, b_9a] = add_condition_9ab(T, n, m, 'a');
 [A_9b, b_9b] = add_condition_9ab(T, n, m, 'b');
 
@@ -40,11 +52,16 @@ m = length(r);
 %% Condition 14 Cost limit
 [A_14, b_14] = add_condition_14(T, n, m, mu, arrival_rate, delay_limit);
 
+
+
+
 %% ADD Equality conditions
 %% Condition 7
+% Каждая станция должна быть размещена только в одной точке.
 [A_7, b_7] = add_condition_7(T, n, m);
 
 %% Equality Condition 7 hatch SUM(xi1) = 1
+
 [A_7h, b_7h] = add_condition_7hatch(T, n, m);
 
 %% Equality Condition 12 Y0,n+1 = 0; E0,n+1 = 1.
@@ -90,11 +107,12 @@ lb = zeros(1, width(total_A));
 
 % upper bound 
 ub = ones(1, width(total_A));
-ub(row_Yname([1, 2])) = inf;
-ub(row_Yname([end-1, end])) = inf;
-ub(row_Yname(3 : end-2)) = inf;
+% ub(row_Yname([1, 2])) = inf;
+% ub(row_Yname([end-1, end])) = inf;
+% ub(row_Yname(3 : end-2)) = inf;
+ub(row_Yname([1, end])) = inf;
 %% Solution
-options = optimoptions(@intlinprog,'OutputFcn',@savemilpsolutions1)
+options = optimoptions(@intlinprog,'OutputFcn',@savemilpsolutions_bsp)
 [x,fval, exitflag,output] = intlinprog(f,intcon,A,b,Aeq,beq,lb,ub, ...
                                        options)
 solution = array2table(x');

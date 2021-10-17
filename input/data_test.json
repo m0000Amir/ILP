@@ -1,15 +1,15 @@
 {
     "1": {
         "placement": [
-            20,
-            30,
-            40
+            5,
+            10,
+            20
         ],
         "gateway_placement": [
             0,
             50
         ],
-        "cost_limit": 32,
+        "cost_limit": 3,
         "delay_limit": 2,
         "arrival_rate": 4,
         "sta": {

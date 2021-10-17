@@ -1,2 +1,5 @@
 output_MILP
-"Placed_stations = [2    4  Inf    3  Inf    1] ; Noncoverage = 1 ; Cost = 18 ; Delay = 1.5"
+"Placed_stations = [4  2  3] ; Noncoverage = 44 ; Cost = 3 ; Delay = 0.5"
+"Placed_stations = [4  2  3] ; Noncoverage = 44 ; Cost = 3 ; Delay = 0.5"
+"Placed_stations = [4  3  2  5] ; Noncoverage = 42 ; Cost = 4 ; Delay = 1.5"
+"Placed_stations = [4    6  Inf    2  Inf    3] ; Noncoverage = 42 ; Cost = 4 ; Delay = 1.5"

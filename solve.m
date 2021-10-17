@@ -1,5 +1,5 @@
 %% LOAD JSON data
-fname = 'data.json'; 
+fname = 'input/data_test.json'; 
 fid = fopen(fname); 
 raw = fread(fid,inf); 
 str = char(raw'); 
@@ -10,7 +10,7 @@ output_MILP = {};
 %% GET SOLUTIONS
 % for i = 1 : size(struct2table(val), 2)
 % TODO: change for loop
-for i = 4
+for i = 1:4
     data = val.(append('x',int2str(i)));
 
     l = data.placement';

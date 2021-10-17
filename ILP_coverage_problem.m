@@ -10,7 +10,7 @@ R = [40, 20];
 n = length(l);
 m = length(r);
 %% objective function
-[T, Yname] = objective_funcion(l, n, m);
+[T, Xname, Yname] = objective_funcion(l, n, m);
 
 %% ADD Inequality conditions
 
@@ -80,10 +80,15 @@ ub(row_Yname(3 : end-2)) = inf;
 solution = array2table(x');
 solution.Properties.VariableNames = total_AVarName;
 t = toc
+
+Placed_stations = get_placed_sta(solution, Xname, n, m);
+% Placed_stations
+print_solution = ['Placed_stations = [', num2str(Placed_stations),']', ...
+    ' ; Noncoverage = ', num2str(l_end + fval)];
 fval
 end
 
-function [table, Yname] = objective_funcion(place, n, m)
+function [table, Xname, Yname] = objective_funcion(place, n, m)
 %% yi
 Yname = {'y0plus', 'y0minus'};
 for i = 1 : n + 1
@@ -465,4 +470,28 @@ end
 A_10c = array2table(A,'VariableNames', tableVarName);
 A_10c.Properties.RowNames = RowNames;
 b_10c = zeros(height(A_10c),1);
+end
+
+function [Placed] = get_placed_sta(solution, xname, n, m)
+    Placed = ones(1, n)*inf;
+    
+    solution_name = solution.Properties.VariableNames;
+    [~, row_x, ~] = intersect(solution_name, xname);
+    p = zeros(1, n*m);
+    s = zeros(1, n*m);
+    solution_x = table2array(solution(1, row_x));
+    index = 1;
+
+    for i = 1 : n
+        for j = 1 : m
+            p(index) = i;
+            s(index) = j;
+            
+            
+            if int8(solution_x(index)) == 1
+                Placed(i) = j;
+            end
+            index = index + 1;
+        end
+    end
 end
