@@ -2,7 +2,7 @@
 Here we will formulate our placement problem in the form of a mixed – integer programming model. 
 
 **The problem description**.
-
+![Alt text](fig.png?raw=true "Title")
 We have a line segment of length `L` with the ends points `a_1` and `a_n`. Each point `a_i` ,`i = 1 ... n` is defined with its one-dimensional coordinate `l_i`. Also we have a set of stations as `S = {s_j}`, `j=1 ... m`. 
 
 Each station has two parameters: a coverage radius `r_j` and a communication radius `R_j`. 
