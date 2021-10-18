@@ -60,6 +60,8 @@ for k = 1 : height(BS)
         BS.Gtr_link(k, 1), Grecv_gateway, Lrecv, SOM, ...
         Precv_gateway, F, K);
 end
-R = [R_sta, R_sta2gateway];
+R1 = [R_sta, R_sta2gateway];
+R2 = [R_sta2gateway', inf]
+R = [R1; R2]
 
 end

@@ -1,11 +1,14 @@
 {"placement": [
-            29,
-            95,
-            139
+            100,
+            155,
+            250,
+            300,
+            400,
+            450
         ],
         "gateway_placement": [
             0,
-            150
+            550
         ],
         "gateway": {
             "Ptr": 20,
@@ -20,7 +23,7 @@
             "Ptr":15,
             "Gtr":2
         },
-        "cost_limit": 22,
+        "cost_limit": 140,
         "sta": {
             "1": {
                 "Ptr_link": 20,

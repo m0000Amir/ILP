@@ -40,6 +40,17 @@ m = length(r);
 [A_8a, b_8a] = add_condition_8ab(T, l, l_end, n, 'a');
 [A_8b, b_8b] = add_condition_8ab(T, l, l_end, n, 'b');
 
+%% Condition 12 Y0,n+1 = 0; E0,n+1 = 1. -- EQUALITY
+
+% Для обеспеченичения условий связи между станциями,задано: 
+%     - $y^+_0$ = 1;
+%     - $y^-_0$ = 1;
+%     - $y^+_{n+1}$ = 1;
+%     - $y^-_{n+1}$ = 1;
+%     - $e_0$ = 1;
+%     - $e_{n+1}$ = 1;
+
+[A_12, b_12] = add_condition_12(T, n);
 
 % =========================================================================
 %% Условие для обеспечения связи через систему размещенных станций
@@ -52,44 +63,31 @@ m = length(r);
 [A_9b, b_9b] = add_condition_9ab(T, n, m, 'b'); 
 
 %% Condition 20 НОВЫЙ -- EQUALITY
-[A_20, b_20] = add_condition_20(T, n, m); % N10a
-
-%% Тот же 25 толко для станций справа от k -- EQUALITY
 
 % Необходимо, чтобы станция $s_j$ в точке $a_i$ была связана с  любой 
 % станцией, расположенной в точке $a_k$, справа от $a_i$ ($ k>i $) или 
 % с правым шлюзом $s_{m + 1}$
+[A_20, b_20] = add_condition_20(T, n, m); % N10a
+
+%% Тот же 25 толко для станций справа от k -- EQUALITY
+
+% Необходимо, чтобы любая станция $s_q$ в точке $a_k$ справа или правый 
+% шлюз $s_{m + 1}$ была связана с со станцией $s_j$ в точке $a_i$ ($k>i$) 
+
 [A_28, b_28] = add_condition_28(T, n, m); % N10a для станции k
 
 %% Тот же 25 толко для станций слева от k -- EQUALITY
 
-% Также станция должна быть связана с любой станцией, расположенной в точке 
-% $a_k$ слева от точки $a_i$ ($k<i$) или с левым шлюзом $s_{m + 1}$
+% Также станция $s_j$ в точке $a_i$ должна быть связана с любой станцией, 
+% расположенной в точке $a_k$ слева от точки $a_i$ ($k<i$) или с левым 
+% шлюзом $s_{m + 1}$
 [A_29, b_29] = add_condition_29(T, n, m); % N10a для станции k
 
 
-
-
-%% ADD Inequality conditions
-
-
-%% 20 Линк только с одной станцией на к-ой точки справа (неравентство)
-[A_26, b_26] = add_condition_26(T, n, m);
-
-%% 25 НОВЫЙ  
+%% 25 18 октября 
+% Также любая станция $s_q$ в точке $a_k$ слева или левый шлюз $s_{m + 1}$
+% должна быть связана со станцией  $s_j$ в точке $a_i$ ($k<i$)
 [A_25, b_25] = add_condition_25(T, n, m); % N10a для станции k
-
-
-
-%% 21 НОВЫЙ 
-[A_21, b_21] = add_condition_21(T, n, m); % N10b
-
-%% 21 Линк только с одной станцией на к-ой точки слева (неравентство)
-[A_27, b_27] = add_condition_27(T, n, m);
-
-%% 22 НОВЫЙ (10Б)SUMZij1 >= e1
-[A_22, b_22] = add_condition_22(T, n, m);
-
 
 %%
 %  Если станции $s_j$ и $s_q$ связаны, то максимальноый радиус связи 
@@ -109,24 +107,7 @@ m = length(r);
 % Бюджетное ограничение
 [A_13, b_13] = add_condition_13(T, n, m, c, cost_limit);
 
-
-%% ADD Equality conditions
-% 
-% 
-
-
-%% Equality Condition 12 Y0,n+1 = 0; E0,n+1 = 1.
-
-% Для обеспеченичения условий связи между станциями,задано: 
-%     - $y^+_0$ = 1;
-%     - $y^-_0$ = 1;
-%     - $y^+_{n+1}$ = 1;
-%     - $y^-_{n+1}$ = 1;
-%     - $e_0$ = 1;
-%     - $e_{n+1}$ = 1;
-
-[A_12, b_12] = add_condition_12(T, n);
-
+% =========================================================================
 %% Matrix preparation
 f = table2array(T);
 % coverage is not integer
@@ -134,9 +115,7 @@ f = table2array(T);
 % and next values is integer
 intcon = (1 + n + 1) * 2 + 1 : length(f);
 
-
-
-%% CONSTRINTS
+%% CONSTRAINTS
 % linear inequality constraints.
 total_A = [A_7h; A_7a; A_7b; A_8a; A_8b; A_9a; A_9b; ...
      A_23; A_24; A_13; ];
@@ -145,17 +124,13 @@ A = table2array(total_A);
 b = [b_7h; b_7a; b_7b; b_8a; b_8b; b_9a; b_9b; ...
      b_23; b_24; b_13;]; 
 
-% linear equality constraints.
-% total_Aeq = [A_7; A_12; A_20; A_21; A_28; A_29];
-% Aeq = table2array(total_Aeq);
-% beq = [b_7; b_12;  b_20; b_21; b_28; b_29];
-
 % % linear equality constraints.
-total_Aeq = [A_7; A_12; A_20;  A_28; A_29];
+total_Aeq = [A_7; A_12; A_20;  A_28; A_29; A_25];
 Aeq = table2array(total_Aeq);
-beq = [b_7; b_12;  b_20;  b_28; b_29];
+beq = [b_7; b_12;  b_20;  b_28; b_29; b_25];
 
-%%
+% =========================================================================
+%% BOUNDS
 
 % bound constraints.
 total_AVarName = total_A.Properties.VariableNames;
@@ -169,8 +144,10 @@ ub = ones(1, width(total_A));
 ub(row_Yname([1, 2])) = inf;
 ub(row_Yname([end-1, end])) = inf;
 ub(row_Yname(3 : end-2)) = inf;
+
+% =========================================================================
 %% Solution
-options = optimoptions(@intlinprog,'OutputFcn',@savemilpsolutions1)
+options = optimoptions(@intlinprog,'OutputFcn',@savemilpsolutions1);
 [x,fval] = intlinprog(f,intcon,A,b,Aeq,beq,lb,ub, options);
 
     function stop = savemilpsolutions1(x,optimValues,state,varargin)
@@ -223,9 +200,6 @@ options = optimoptions(@intlinprog,'OutputFcn',@savemilpsolutions1)
 solution = array2table(x');
 solution.Properties.VariableNames = total_AVarName;
 
-% fval
-% exitflag
-% output
 t = toc
 
 Cost_estimate = calculate_constraints(solution, Xname, ...
@@ -278,20 +252,29 @@ f = [f, 0 * ones(1,n + 2)];
 %% zijk
 Zname = {};
 
+for i = 1 : n 
+    for j = 1 : n
+        Z = ['z0_', ... 
+             num2str(m+1), '_', num2str(i), ...
+             '_', num2str(j)];
+        Zname = [Zname, Z];
+    end
+end
+
 
 for i = 1 : n
     for j = 1 : m
         for k = 0 : n + 1
             if i ~= k
-                if k == 0 || k == n + 1 ... gateway S_0 and S_{n+1}
+                if k == 0 || k == n + 1 % gateway S_0 and S_{n+1}
                     Z = ['z', num2str(i), '_', ... 
                         num2str(j), '_', num2str(k), ...
                         '_', num2str(m+1)];
                     Zname = [Zname, Z];
                 
                 else                
-                    for q = 1 : m ... Stations
-                        if j~= q
+                    for q = 1 : m  %Stations
+                        if (j~= q)
                             Z = ['z', num2str(i), '_', ... 
                                 num2str(j), '_', num2str(k), ...
                                 '_', num2str(q)];
@@ -302,6 +285,15 @@ for i = 1 : n
               
             end
         end
+    end
+end
+
+for i = 1 : n 
+    for j = 1 : n
+        Z = ['z', num2str(n+1), '_', ... 
+             num2str(m+1), '_', num2str(i), ...
+             '_', num2str(j)];
+        Zname = [Zname, Z];
     end
 end
 
@@ -441,11 +433,7 @@ for i = 1 : n
                         index_e = k;
                 end
                 if k == 0 || k == n + 1 ... gateway S_0 and S_{n+1}
-%                     Z = ['z', num2str(i), '_', ... 
-%                         num2str(j), '_', num2str(k), ...
-%                         '_', num2str(0)];
-%                     Zname = [Zname, Z];
-                    
+                        
                     var_e = ['e', num2str(index_e)];
                     var_z = ['z', num2str(i), '_', ... 
                             num2str(j), '_', num2str(k), ...
@@ -612,33 +600,31 @@ for k = 1 : n
     for q = 1 : m
         mas = zeros(1, width(table));
         var_z = {};
-        if k == 0 || k == n + 1
-            var_x = ['x', num2str(k), num2str(m+1)];
-        else
-            var_x = ['x', num2str(k), num2str(q)];
-        end
+        var_x = ['x', num2str(k), num2str(q)];
+%         if k == 0 || k == n + 1
+%             var_x = ['x', num2str(k), num2str(m+1)];
+%         else
+%             var_x = ['x', num2str(k), num2str(q)];
+%         end
         [~, row_x, ~] = intersect(tableVarName, var_x);
         mas(1, row_x) = 1;
-        for i = 1 : n
-            if i ~= k
+        
+        for i = 0 : k-1
+            if (i == 0)
+                var_z = [var_z, ...
+                    ['z', num2str(i), '_', ... 
+                    num2str(m+1), '_', num2str(k), ...
+                    '_', num2str(q)]];
+            else
                 for j = 1 : m
-                    if k == 0 || k == n + 1 
-                        var_z = [var_z, ...
-                            ['z', num2str(i), '_', ... 
-                            num2str(j), '_', num2str(k), ...
-                            '_', num2str(m+1)]];
-                    else
-                        if j ~= q
-                            var_z = [var_z, ...
+                   if j ~= q
+                       var_z = [var_z, ...
                             ['z', num2str(i), '_', ... 
                             num2str(j), '_', num2str(k), ...
                             '_', num2str(q)]];
-                        end
-
-                    end
+                   end
                 end
-            end
-            
+            end            
         end
         [~, row_z, ~] = intersect(tableVarName, var_z);
         mas(1, row_z) = -1;
@@ -671,38 +657,59 @@ tableVarName = table.Properties.VariableNames;
 A = [];
 RowNames = {};
 
-for k = 1 : n - 1
+for k = 1 : n
     for q = 1 : m
         mas = zeros(1, width(table));
         var_z = {};
-        if k == 0 || k == n + 1
-            var_x = ['x', num2str(k), num2str(m+1)];
-        else
-            var_x = ['x', num2str(k), num2str(q)];
-        end
+        var_x = ['x', num2str(k), num2str(q)];
+%         if k == 0 || k == n + 1
+%             var_x = ['x', num2str(k), num2str(m+1)];
+%         else
+%             var_x = ['x', num2str(k), num2str(q)];
+%         end
         [~, row_x, ~] = intersect(tableVarName, var_x);
         mas(1, row_x) = 1;
         for i = k + 1 : n + 1
             if i ~= k
-                for j = 1 : m
-                    if k == 0 || k == n + 1 
-                        var_z = [var_z, ...
-                            ['z', num2str(i), '_', ... 
-                            num2str(j), '_', num2str(k), ...
-                            '_', num2str(m+1)]];
-                    else
+                if i == n + 1 
+                    var_z = [var_z, ...
+                        ['z', num2str(i), '_', ... 
+                        num2str(m+1), '_', num2str(k), ...
+                        '_', num2str(q)]];
+                else
+                    for j = 1 : m
                         if j ~= q
                             var_z = [var_z, ...
                             ['z', num2str(i), '_', ... 
                             num2str(j), '_', num2str(k), ...
                             '_', num2str(q)]];
                         end
-
-                    end
+                    end  
                 end
-            end
-            
+            end 
         end
+% TODO: delete this comments
+%         for i = k + 1 : n + 1
+%             if i ~= k
+%                 for j = 1 : m
+%                     if i == 0 || i == n + 1 
+%                         var_z = [var_z, ...
+%                             ['z', num2str(i), '_', ... 
+%                             num2str(m+1), '_', num2str(k), ...
+%                             '_', num2str(1)]]
+%                     else
+%                         if j ~= q
+%                             var_z = [var_z, ...
+%                             ['z', num2str(i), '_', ... 
+%                             num2str(j), '_', num2str(k), ...
+%                             '_', num2str(q)]]
+%                         end
+% 
+%                     end
+%                 end
+%             end
+%             
+%         end
         [~, row_z, ~] = intersect(tableVarName, var_z);
         mas(1, row_z) = -1;
         if k == 0 || k == n + 1
@@ -734,38 +741,33 @@ tableVarName = table.Properties.VariableNames;
 A = [];
 RowNames = {};
 
-for k = 2 : n
+for k = 1 : n
     for q = 1 : m
         mas = zeros(1, width(table));
         var_z = {};
-        if k == 0 || k == n + 1
-            var_x = ['x', num2str(k), num2str(m+1)];
-        else
-            var_x = ['x', num2str(k), num2str(q)];
-        end
+        var_x = ['x', num2str(k), num2str(q)];
+
         [~, row_x, ~] = intersect(tableVarName, var_x);
         mas(1, row_x) = 1;
         for i = 0 : k - 1
-            if i ~= k
+            if (i == 0)
+                var_z = [var_z, ...
+                            ['z', num2str(i), '_', ... 
+                            num2str(m+1), '_', num2str(k), ...
+                            '_', num2str(q)]];   
+            else
                 for j = 1 : m
-                    if k == 0 || k == n + 1 
+                    if j ~= q
                         var_z = [var_z, ...
-                            ['z', num2str(i), '_', ... 
-                            num2str(j), '_', num2str(k), ...
-                            '_', num2str(m+1)]];
-                    else
-                        if j ~= q
-                            var_z = [var_z, ...
-                            ['z', num2str(i), '_', ... 
-                            num2str(j), '_', num2str(k), ...
-                            '_', num2str(q)]];
-                        end
-
-                    end
+                        ['z', num2str(i), '_', ... 
+                        num2str(j), '_', num2str(k), ...
+                        '_', num2str(q)]];
+                    end 
                 end
+                
             end
-            
         end
+        
         [~, row_z, ~] = intersect(tableVarName, var_z);
         mas(1, row_z) = -1;
         if k == 0 || k == n + 1
@@ -942,6 +944,47 @@ for i = 1 : n
                         
                     end
                 end
+            end
+        end
+    end
+end
+
+i = n + 1;
+j = m + 1;
+
+for k = i - 1 : -1 : 0
+    if k == 0
+        var_z = ['z', num2str(i), '_', num2str(j), '_', ...
+        num2str(k), '_', num2str(m+1)];
+
+        RowNames = [RowNames, ['-z', num2str(i), num2str(j), ...
+        num2str(k),num2str(m+1) '(R', num2str(j), '_',...
+        num2str(m+1), '-(a', num2str(i), ...
+        '-a', num2str(k), '))']];
+
+        [~, row_z, ~] = intersect(tableVarName, var_z);
+
+        mas = zeros(1, width(table));
+        mas(1, row_z) = -(R(j,m+1) - (place(i+1) - place(k+1)));
+        A = [A; mas];
+
+    else
+        for q = 1 : m
+            if j ~= q
+                var_z = ['z', num2str(i), '_', num2str(j), '_', ...
+                num2str(k), '_', num2str(q)];
+
+                RowNames = [RowNames, ['-z', num2str(i), num2str(j), ...
+                num2str(k),num2str(q) '(R', num2str(j), '_',...
+                num2str(q), '-(a', num2str(i), ...
+                '-a', num2str(k), '))']];
+
+                [~, row_z, ~] = intersect(tableVarName, var_z);
+
+                mas = zeros(1, width(table));
+                mas(1, row_z) = -(R(j,q) - (place(i+1) - place(k+1)));
+                A = [A; mas];
+
             end
         end
     end

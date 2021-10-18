@@ -96,8 +96,10 @@ for k = 1 : height(solution)
     output_data(k).Grecv_gateway = Grecv_gateway;
     output_data(k).Precv_gateway = Precv_gateway
     output_data(k).gateway_coordinate = l_end;
-    if isempty(fInt)
+    if isempty(fInt) 
         output_data(k).f = -1 * fval;
+    elseif (length(fInt)== 1)
+        output_data(k).f = -1 * fInt;
     else
         output_data(k).f = -1 * fInt(k);
     end
