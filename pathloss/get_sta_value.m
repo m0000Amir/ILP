@@ -61,7 +61,7 @@ for k = 1 : height(BS)
         Precv_gateway, F, K);
 end
 R1 = [R_sta, R_sta2gateway];
-R2 = [R_sta2gateway', inf]
-R = [R1; R2]
+R2 = [R_sta2gateway', inf];
+R = [R1; R2];
 
 end

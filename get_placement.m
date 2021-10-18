@@ -1,5 +1,6 @@
 function get_placement()
 clear;
+addpath('./pathloss/')
 
 fname = 'input/input_test.json'; 
 fid = fopen(fname); 

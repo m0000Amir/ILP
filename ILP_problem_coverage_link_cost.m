@@ -2,6 +2,9 @@
     l, l_end, r, R, c)
 
 tic
+addpath('./coverage_condition/')
+addpath('./link_condition/')
+
 
 n = length(l);
 m = length(r);
@@ -16,76 +19,93 @@ m = length(r);
 
 % В точке может быть размещена только одна точка
 % $e_i = \sum\limits_{j=1}^m x_{ij}$
-[A_7, b_7] = add_condition_7(T, n, m);
+[A_7, b_7] = point_is_include_sta(T, n, m);
+% [A_7, b_7] = add_condition_7(T, n, m);
+
 
 %% condition 7 hatch SUM(xi1) = 1 -- INEQUALITY
 
 % Каждая станция должна быть размещена только в одной точке.
-[A_7h, b_7h] = add_condition_7hatch(T, n, m);
+[A_7h, b_7h] = sta_must_be_placed_in_only_one_point(T, n, m);
+% [A_7h, b_7h] = add_condition_7hatch(T, n, m);
 
 %% condition 7Ю,А  -- INEQUALITY
 
 % Значения покрытий не превышают радиус покрытия станции, размещенной в 
 % точке $a_i$, и равны 0, если в точке $a_i$  нет станции
-[A_7a, b_7a] = add_condition_7ab(T, r, 'plus', n, m);
-[A_7b, b_7b] = add_condition_7ab(T, r, 'minus', n, m);
+[A_7a, b_7a] = sta_coverage_is_no_more_than_coverage_radius(...
+    T, r, 'plus', n, m);
+[A_7b, b_7b] = sta_coverage_is_no_more_than_coverage_radius(...
+    T, r, 'minus', n, m);
+% [A_7a, b_7a] = add_condition_7ab(T, r, 'plus', n, m);
+% [A_7b, b_7b] = add_condition_7ab(T, r, 'minus', n, m);
 
 %% Condition 8Ю,А  -- INEQUALITY
 
 
 % Общая область покрытия между любыми двумя точками $a_i$ и $a_k$, где 
 % расположены станции, не может превышать расстояние между этими точками.
-[A_8a, b_8a] = add_condition_8ab(T, l, l_end, n, 'a');
-[A_8b, b_8b] = add_condition_8ab(T, l, l_end, n, 'b');
+[A_8a, b_8a] = coverage_sum_between_sta(T, l, l_end, n, 'a');
+[A_8b, b_8b] = coverage_sum_between_sta(T, l, l_end, n, 'b');
+
+% [A_8a, b_8a] = add_condition_8ab(T, l, l_end, n, 'a');
+% [A_8b, b_8b] = add_condition_8ab(T, l, l_end, n, 'b');
 
 %% Condition 12 Y0,n+1 = 0; E0,n+1 = 1. -- EQUALITY
 
 % Для обеспеченичения условий связи между станциями,задано: 
-%     - $y^+_0$ = 1;
-%     - $y^-_0$ = 1;
-%     - $y^+_{n+1}$ = 1;
-%     - $y^-_{n+1}$ = 1;
+%     - $y^+_0$ = 0;
+%     - $y^-_0$ = 0;
+%     - $y^+_{n+1}$ = 0;
+%     - $y^-_{n+1}$ = 0;
 %     - $e_0$ = 1;
 %     - $e_{n+1}$ = 1;
-
-[A_12, b_12] = add_condition_12(T, n);
+[A_12, b_12] = gateway_condition(T, n);
+% [A_12, b_12] = add_condition_12(T, n);
 
 % =========================================================================
 %% Условие для обеспечения связи через систему размещенных станций
-% 
 
 %% Condition (9Ю, 9А)  -- INEQUALITY
 
 % Станции должны быть размещены в обеих точках $a_i$ и $a_k$
-[A_9a, b_9a] = add_condition_9ab(T, n, m, 'a'); 
-[A_9b, b_9b] = add_condition_9ab(T, n, m, 'b'); 
+[A_9a, b_9a] = sta_must_be_placed_to_link(T, n, m, 'a'); 
+[A_9b, b_9b] = sta_must_be_placed_to_link(T, n, m, 'b'); 
+
+% [A_9a, b_9a] = add_condition_9ab(T, n, m, 'a'); 
+% [A_9b, b_9b] = add_condition_9ab(T, n, m, 'b'); 
 
 %% Condition 20 НОВЫЙ -- EQUALITY
 
 % Необходимо, чтобы станция $s_j$ в точке $a_i$ была связана с  любой 
 % станцией, расположенной в точке $a_k$, справа от $a_i$ ($ k>i $) или 
 % с правым шлюзом $s_{m + 1}$
-[A_20, b_20] = add_condition_20(T, n, m); % N10a
+
+[A_20, b_20] = sta_is_connected_with_right_sta(T, n, m); % N10a
+% [A_20, b_20] = add_condition_20(T, n, m); % N10a
 
 %% Тот же 25 толко для станций справа от k -- EQUALITY
 
 % Необходимо, чтобы любая станция $s_q$ в точке $a_k$ справа или правый 
 % шлюз $s_{m + 1}$ была связана с со станцией $s_j$ в точке $a_i$ ($k>i$) 
 
-[A_28, b_28] = add_condition_28(T, n, m); % N10a для станции k
+[A_28, b_28] = right_sta_is_also_connected_with_sta(T, n, m); 
+% [A_28, b_28] = add_condition_28(T, n, m);
 
 %% Тот же 25 толко для станций слева от k -- EQUALITY
 
 % Также станция $s_j$ в точке $a_i$ должна быть связана с любой станцией, 
 % расположенной в точке $a_k$ слева от точки $a_i$ ($k<i$) или с левым 
 % шлюзом $s_{m + 1}$
-[A_29, b_29] = add_condition_29(T, n, m); % N10a для станции k
+[A_29, b_29] = sta_is_connected_with_left_sta(T, n, m);
+% [A_29, b_29] = add_condition_29(T, n, m);
 
 
-%% 25 18 октября 
+%% 25 18 октября  -- EQUALITY
 % Также любая станция $s_q$ в точке $a_k$ слева или левый шлюз $s_{m + 1}$
 % должна быть связана со станцией  $s_j$ в точке $a_i$ ($k<i$)
-[A_25, b_25] = add_condition_25(T, n, m); % N10a для станции k
+[A_25, b_25] = left_sta_is_also_connectd_with_sta(T, n, m); 
+% [A_25, b_25] = add_condition_25(T, n, m);
 
 %%
 %  Если станции $s_j$ и $s_q$ связаны, то максимальноый радиус связи 
@@ -94,16 +114,20 @@ m = length(r);
 
 % 23 НОВЫЙ
 % ДОДЕЛАТЬ
-[A_23, b_23] = add_condition_23(T, l, l_end, R, n, m);
+
+[A_23, b_23] = link_to_the_left_sta(T, l, l_end, R, n, m);
+
+% [A_23, b_23] = add_condition_23(T, l, l_end, R, n, m);
 
 % 24 НОВЫЙ
 % ДОДЕЛАТЬ
-[A_24, b_24] = add_condition_24(T, l, l_end, R, n, m);
+[A_24, b_24] = link_to_the_right_sta(T, l, l_end, R, n, m);
+% [A_24, b_24] = add_condition_24(T, l, l_end, R, n, m);
 
 
 %% Condition 13 Cost limit
 % Бюджетное ограничение
-[A_13, b_13] = add_condition_13(T, n, m, c, cost_limit);
+[A_13, b_13] = cost_condition(T, n, m, c, cost_limit);
 
 % =========================================================================
 %% Matrix preparation
@@ -111,8 +135,9 @@ f = table2array(T);
 % coverage is not integer
 % gateway_coverage + placed_sta_coverage + gateway_coverage) * 2
 % and next values is integer
-intcon = (1 + n + 1) * 2 + 1 : length(f);
+% intcon = (1 + n + 1) * 2 + 1 : length(f);
 
+intcon = 1: length(f);
 %% CONSTRAINTS
 % linear inequality constraints.
 total_A = [A_7h; A_7a; A_7b; A_8a; A_8b; A_9a; A_9b; ...
@@ -139,9 +164,8 @@ lb = zeros(1, width(total_A));
 
 % upper bound 
 ub = ones(1, width(total_A));
-ub(row_Yname([1, 2])) = inf;
-ub(row_Yname([end-1, end])) = inf;
-ub(row_Yname(3 : end-2)) = inf;
+ub(row_Yname(1: end-2)) = inf;
+
 
 % =========================================================================
 %% Solution
@@ -308,667 +332,7 @@ table.Properties.VariableNames = VarName;
 table.Properties.RowNames = {'f'};
 end
 
-function [A_7, b_7] = add_condition_7(table, n, m)
-tableVarName = table.Properties.VariableNames;
-A = zeros(n, width(table));
-RowNames = {};
-
-for i = 1 : n
-    var_e = ['e', num2str(i)];
-    [~, row_e, ~] = intersect(tableVarName, var_e);
-    A(i, row_e) = 1;
-    for j = 1 : m
-        var_x = ['x', num2str(i), num2str(j)];
-        [~, row_x, ~] = intersect(tableVarName, var_x);
-        A(i, row_x) = -1;
-    end
-    RowNames = [RowNames, ['e', num2str(i)]];
-end
-
-A_7 = array2table(A,'VariableNames', tableVarName);
-A_7.Properties.RowNames = RowNames;
-b_7 = zeros(height(A_7),1);
-end
-
-function [A_7ab, b_7ab] = add_condition_7ab(table, r, symbol, n, m)
-tableVarName = table.Properties.VariableNames;
-A = zeros(n, width(table));
-RowNames = {};
-for i = 1 : n
-    var_y = ['y', num2str(i), symbol];
-    [~, row_y, ~] = intersect(tableVarName, var_y);
-    A(i, row_y) = 1;
-    for j = 1 : m
-        var_x = ['x', num2str(i), num2str(j)];
-        [~, row_x, ~] = intersect(tableVarName,var_x);
-    A(i, row_x) = -1 * r(j);
-    end
-    RowNames = [RowNames, ['y', num2str(i), symbol]];
-end
-A_7ab = array2table(A,'VariableNames', tableVarName);
-A_7ab.Properties.RowNames = RowNames;
-b_7ab = zeros(height(A_7ab),1);
-end
-
-function [A_8, b_8] = add_condition_8ab(table, place, place_end, n, key)
-tableVarName = table.Properties.VariableNames;
-A = [];
-% b_2 = [];
-RowNames = {};
-if key == 'a'
-    symbol1 = 'plus';
-    symbol2 = 'minus';
-elseif key == 'b'
-    symbol1 = 'minus';
-    symbol2 = 'plus';
-end
-place = [0, place, place_end];
-for i = 1 : n
-    yi = ['y', num2str(i), symbol1];
-    [~, row_yi, ~] = intersect(tableVarName, yi);
-    
-    ei = ['e', num2str(i)];
-    [~, row_ei, ~] = intersect(tableVarName, ei);
-    
-    switch key
-        case 'a'        
-            for k = i + 1 : n + 1
-                yk = ['y', num2str(k), symbol2];
-                [~, row_yk, ~] = intersect(tableVarName, yk);
-                ek = ['e', num2str(k)];
-                [~, row_ek, ~] = intersect(tableVarName, ek);
-                
-                mas = zeros(1, width(table));
-                mas(1, row_yi) = 1;
-                mas(1, row_ei) = -1*(0.5 * (place(k+1) - place(i+1)) ...
-                    - place_end);
-                
-                mas(1, row_yk) = 1;
-                mas(1, row_ek) = -1*(0.5 * (place(k+1) - place(i+1)) ...
-                    - place_end);
-                A = [A; mas];
-                RowNames = [RowNames, ...
-                    ['y', num2str(i), symbol1, '-y', num2str(k)]];
-            end
-        case 'b'
-            for k = i - 1 : -1: 0
-                yk = ['y', num2str(k), symbol2];
-                [~, row_yk, ~] = intersect(tableVarName, yk);
-                ek = ['e', num2str(k)];
-                [~, row_ek, ~] = intersect(tableVarName, ek);
-                
-                mas = zeros(1, width(table));
-                mas(1, row_yi) = 1;
-                mas(1, row_ei) = -1*(0.5 * (place(i+1) - place(k+1)) ...
-                    - place_end);
-                
-                mas(1, row_yk) = 1;
-                mas(1, row_ek) = -1*(0.5 * (place(i+1) - place(k+1)) ...
-                    - place_end);
-                A = [A; mas];
-                RowNames = [RowNames, ...
-                    ['y', num2str(i), symbol1, '-y', num2str(k)]];
-            end    
-    end
-end
-A_8 = array2table(A,'VariableNames', tableVarName);
-A_8.Properties.RowNames = RowNames;
-b_8 = ones(height(A_8),1) * 2 * place_end;
-end
-
-function [A_9, b_9] = add_condition_9ab(table, n, m, key)
-tableVarName = table.Properties.VariableNames;
-A = [];
-RowNames = {};
-
-%%
-for i = 1 : n
-    for j = 1 : m
-        for k = 0 : n + 1
-            if i ~= k
-                switch key
-                    case 'a'
-                        index_e = i;
-                    case 'b'
-                        index_e = k;
-                end
-                if k == 0 || k == n + 1 ... gateway S_0 and S_{n+1}
-                        
-                    var_e = ['e', num2str(index_e)];
-                    var_z = ['z', num2str(i), '_', ... 
-                            num2str(j), '_', num2str(k), ...
-                            '_', num2str(m+1)];
-                    RowNames = [RowNames, ...
-                        ['z', num2str(i), '_', ... 
-                        num2str(j), '_', num2str(k), ...
-                        '_', num2str(m+1), '-e', num2str(index_e)];];
-                    
-                    [~, row_e, ~] = intersect(tableVarName, var_e);
-                    [~, row_z, ~] = intersect(tableVarName, var_z);
-                    mas = zeros(1, width(table));
-                    mas(1, row_e) = -1;
-                    mas(1, row_z) = 1;
-                    A = [A; mas];
-                
-                else                
-                    for q = 1 : m ... Stations
-                        if j~= q
-                            var_e = ['e', num2str(index_e)];
-                            var_z = ['z', num2str(i), '_', ... 
-                                    num2str(j), '_', num2str(k), ...
-                                    '_', num2str(0)];
-                            RowNames = [RowNames, ...
-                                ['z', num2str(i), '_', ... 
-                                num2str(j), '_', num2str(k), ...
-                                '_', num2str(q), '-e', num2str(index_e)];];
-                            [~, row_e, ~] = intersect(tableVarName, var_e);
-                            [~, row_z, ~] = intersect(tableVarName, var_z);
-                            mas = zeros(1, width(table));
-                            mas(1, row_e) = -1;
-                            mas(1, row_z) = 1;
-                            A = [A; mas];                            
-                        end
-                    end
-                end
-              
-            end
-        end
-    end
-end
-%5
-
-A_9 = array2table(A,'VariableNames', tableVarName);
-A_9.Properties.RowNames = RowNames;
-b_9 = zeros(height(A_9),1);
-end
-
-function [A_20, b_20] = add_condition_20(table, n, m)
-% Условие радиорелейной связи
-% 
-% Обеспечить связи со станцией k, k = i + 1 : n + 1
-% 
-% Sum{для k=i+1:n+1}Zijkq >= (или =) xij для всех i, j, q
-% 
-tableVarName = table.Properties.VariableNames;
-A = [];
-RowNames = {};
-
-for i = 1 : n
-    for j = 1 : m
-        mas = zeros(1, width(table));
-        var_z = {};
-        var_x = ['x', num2str(i), num2str(j)];
-        [~, row_x, ~] = intersect(tableVarName, var_x);
-        mas(1, row_x) = 1;
-        for k = i + 1 : n + 1
-            if k == n + 1
-                var_z = [var_z, ...
-                    ['z', num2str(i), '_', ... 
-                    num2str(j), '_', num2str(k), ...
-                    '_', num2str(m+1)]];
-            else
-                for q = 1 : m
-                    if j ~= q
-                        var_z = [var_z, ...
-                        ['z', num2str(i), '_', ... 
-                        num2str(j), '_', num2str(k), ...
-                        '_', num2str(q)]];
-                    end
-
-                end
-            end
-        end
-        [~, row_z, ~] = intersect(tableVarName, var_z);
-        mas(1, row_z) = -1;
-        RowNames = [RowNames, ['x', num2str(i), num2str(j), ...
-            '-SUMz', num2str(i), '_', ... 
-            num2str(j), '_', num2str(k), ...
-            '_', num2str(m+1)]];
-        A = [A; mas];        
-             
-    end
-end
-A_20 = array2table(A,'VariableNames', tableVarName);
-A_20.Properties.RowNames = RowNames;
-b_20 = zeros(height(A_20),1);
-end
-
-function [A_25, b_25] = add_condition_25(table, n, m)
-% Условие радиорелейной связи
-% 
-% Обеспечить связи со станцией k, k = 1 : n
-% 
-% Sum{для k=i+1:n+1}Zijkq >= (или =) xkq для всех i, j, q
-% 
-tableVarName = table.Properties.VariableNames;
-A = [];
-RowNames = {};
-
-for k = 1 : n
-    for q = 1 : m
-        mas = zeros(1, width(table));
-        var_z = {};
-        var_x = ['x', num2str(k), num2str(q)];
-%         if k == 0 || k == n + 1
-%             var_x = ['x', num2str(k), num2str(m+1)];
-%         else
-%             var_x = ['x', num2str(k), num2str(q)];
-%         end
-        [~, row_x, ~] = intersect(tableVarName, var_x);
-        mas(1, row_x) = 1;
-        
-        for i = 0 : k-1
-            if (i == 0)
-                var_z = [var_z, ...
-                    ['z', num2str(i), '_', ... 
-                    num2str(m+1), '_', num2str(k), ...
-                    '_', num2str(q)]];
-            else
-                for j = 1 : m
-                   if j ~= q
-                       var_z = [var_z, ...
-                            ['z', num2str(i), '_', ... 
-                            num2str(j), '_', num2str(k), ...
-                            '_', num2str(q)]];
-                   end
-                end
-            end            
-        end
-        [~, row_z, ~] = intersect(tableVarName, var_z);
-        mas(1, row_z) = -1;
-        if k == 0 || k == n + 1
-            RowNames = [RowNames, ['x', num2str(k), num2str(m+1), ...
-                '-SUMzijkq']];
-        else
-            RowNames = [RowNames, ['x', num2str(k), num2str(q), ...
-                '-SUMzijkq']];
-        end
-        A = [A; mas];       
-        
-    end
-        
-end
-
-A_25 = array2table(A,'VariableNames', tableVarName);
-% A_25.Properties.RowNames = RowNames;
-b_25 = zeros(height(A_25),1);
-end
-
-function [A_28, b_28] = add_condition_28(table, n, m)
-% Условие радиорелейной связи
-% 
-% Обеспечить связи со станцией k, k = 1 : n - 1
-% 
-% Sum{для k=i+1:n+1}Zijkq >= (или =) xkq для всех i, j, q
-% 
-tableVarName = table.Properties.VariableNames;
-A = [];
-RowNames = {};
-
-for k = 1 : n
-    for q = 1 : m
-        mas = zeros(1, width(table));
-        var_z = {};
-        var_x = ['x', num2str(k), num2str(q)];
-%         if k == 0 || k == n + 1
-%             var_x = ['x', num2str(k), num2str(m+1)];
-%         else
-%             var_x = ['x', num2str(k), num2str(q)];
-%         end
-        [~, row_x, ~] = intersect(tableVarName, var_x);
-        mas(1, row_x) = 1;
-        for i = k + 1 : n + 1
-            if i ~= k
-                if i == n + 1 
-                    var_z = [var_z, ...
-                        ['z', num2str(i), '_', ... 
-                        num2str(m+1), '_', num2str(k), ...
-                        '_', num2str(q)]];
-                else
-                    for j = 1 : m
-                        if j ~= q
-                            var_z = [var_z, ...
-                            ['z', num2str(i), '_', ... 
-                            num2str(j), '_', num2str(k), ...
-                            '_', num2str(q)]];
-                        end
-                    end  
-                end
-            end 
-        end
-% TODO: delete this comments
-%         for i = k + 1 : n + 1
-%             if i ~= k
-%                 for j = 1 : m
-%                     if i == 0 || i == n + 1 
-%                         var_z = [var_z, ...
-%                             ['z', num2str(i), '_', ... 
-%                             num2str(m+1), '_', num2str(k), ...
-%                             '_', num2str(1)]]
-%                     else
-%                         if j ~= q
-%                             var_z = [var_z, ...
-%                             ['z', num2str(i), '_', ... 
-%                             num2str(j), '_', num2str(k), ...
-%                             '_', num2str(q)]]
-%                         end
-% 
-%                     end
-%                 end
-%             end
-%             
-%         end
-        [~, row_z, ~] = intersect(tableVarName, var_z);
-        mas(1, row_z) = -1;
-        if k == 0 || k == n + 1
-            RowNames = [RowNames, ['x', num2str(k), num2str(m+1), ...
-                '-SUMzijkq']];
-        else
-            RowNames = [RowNames, ['x', num2str(k), num2str(q), ...
-                '-SUMzijkq']];
-        end
-        A = [A; mas];       
-        
-    end
-        
-end
-
-A_28 = array2table(A,'VariableNames', tableVarName);
-% A_28.Properties.RowNames = RowNames;
-b_28 = zeros(height(A_28),1);
-end
-
-function [A_29, b_29] = add_condition_29(table, n, m)
-% Условие радиорелейной связи
-% 
-% Обеспечить связи со станцией k, k = 1 : n - 1
-% 
-% Sum{для k=i+1:n+1}Zijkq >= (или =) xkq для всех i, j, q
-% 
-tableVarName = table.Properties.VariableNames;
-A = [];
-RowNames = {};
-
-for k = 1 : n
-    for q = 1 : m
-        mas = zeros(1, width(table));
-        var_z = {};
-        var_x = ['x', num2str(k), num2str(q)];
-
-        [~, row_x, ~] = intersect(tableVarName, var_x);
-        mas(1, row_x) = 1;
-        for i = 0 : k - 1
-            if (i == 0)
-                var_z = [var_z, ...
-                            ['z', num2str(i), '_', ... 
-                            num2str(m+1), '_', num2str(k), ...
-                            '_', num2str(q)]];   
-            else
-                for j = 1 : m
-                    if j ~= q
-                        var_z = [var_z, ...
-                        ['z', num2str(i), '_', ... 
-                        num2str(j), '_', num2str(k), ...
-                        '_', num2str(q)]];
-                    end 
-                end
-                
-            end
-        end
-        
-        [~, row_z, ~] = intersect(tableVarName, var_z);
-        mas(1, row_z) = -1;
-        if k == 0 || k == n + 1
-            RowNames = [RowNames, ['x', num2str(k), num2str(m+1), ...
-                '-SUMzijkq']];
-        else
-            RowNames = [RowNames, ['x', num2str(k), num2str(q), ...
-                '-SUMzijkq']];
-        end
-        A = [A; mas];       
-        
-    end
-        
-end
-
-A_29 = array2table(A,'VariableNames', tableVarName);
-% A_29.Properties.RowNames = RowNames;
-b_29 = zeros(height(A_29),1);
-end
-
-function [A_23, b_23] = add_condition_23(table, place, place_end, ...
-    R, n, m)
-
-% Условие: Радиус связи не меньше расстояния между станциями
-% 
-% Обеспечить:
-% 
-% Zijkq(Rjq 0 (ai - ak) >= 0 k = i - 1, ..., 0.
-% 
-
-tableVarName = table.Properties.VariableNames;
-RowNames = {};
-A = [];
-place = [0, place, place_end];
-
-for i = 1 : n
-    for j = 1 : m
-        for k = i - 1 : -1 : 0
-            if k == 0
-                var_z = ['z', num2str(i), '_', num2str(j), '_', ...
-                num2str(k), '_', num2str(m+1)];
-
-                RowNames = [RowNames, ['-z', num2str(i), num2str(j), ...
-                num2str(k),num2str(m+1) '(R', num2str(j), '_',...
-                num2str(m+1), '-(a', num2str(i), ...
-                '-a', num2str(k), '))']];
-
-                [~, row_z, ~] = intersect(tableVarName, var_z);
-
-                mas = zeros(1, width(table));
-                mas(1, row_z) = -(R(j,m+1) - (place(i+1) - place(k+1)));
-                A = [A; mas];
-                
-            else
-                for q = 1 : m
-                    if j ~= q
-                        var_z = ['z', num2str(i), '_', num2str(j), '_', ...
-                        num2str(k), '_', num2str(q)];
-                    
-                        RowNames = [RowNames, ['-z', num2str(i), num2str(j), ...
-                        num2str(k),num2str(q) '(R', num2str(j), '_',...
-                        num2str(q), '-(a', num2str(i), ...
-                        '-a', num2str(k), '))']];
-                    
-                        [~, row_z, ~] = intersect(tableVarName, var_z);
-                    
-                        mas = zeros(1, width(table));
-                        mas(1, row_z) = -(R(j,q) - (place(i+1) - place(k+1)));
-                        A = [A; mas];
-                        
-                    end
-                end
-            end
-        end
-    end
-end
-
-i = n + 1;
-j = m + 1;
-
-for k = i - 1 : -1 : 0
-    if k == 0
-        var_z = ['z', num2str(i), '_', num2str(j), '_', ...
-        num2str(k), '_', num2str(m+1)];
-
-        RowNames = [RowNames, ['-z', num2str(i), num2str(j), ...
-        num2str(k),num2str(m+1) '(R', num2str(j), '_',...
-        num2str(m+1), '-(a', num2str(i), ...
-        '-a', num2str(k), '))']];
-
-        [~, row_z, ~] = intersect(tableVarName, var_z);
-
-        mas = zeros(1, width(table));
-        mas(1, row_z) = -(R(j,m+1) - (place(i+1) - place(k+1)));
-        A = [A; mas];
-
-    else
-        for q = 1 : m
-            if j ~= q
-                var_z = ['z', num2str(i), '_', num2str(j), '_', ...
-                num2str(k), '_', num2str(q)];
-
-                RowNames = [RowNames, ['-z', num2str(i), num2str(j), ...
-                num2str(k),num2str(q) '(R', num2str(j), '_',...
-                num2str(q), '-(a', num2str(i), ...
-                '-a', num2str(k), '))']];
-
-                [~, row_z, ~] = intersect(tableVarName, var_z);
-
-                mas = zeros(1, width(table));
-                mas(1, row_z) = -(R(j,q) - (place(i+1) - place(k+1)));
-                A = [A; mas];
-
-            end
-        end
-    end
-end
-
-A_23 = array2table(A,'VariableNames', tableVarName);
-A_23.Properties.RowNames = RowNames;
-b_23 = zeros(height(A_23),1);
-end
-
-function [A_24, b_24] = add_condition_24(table, place, place_end, ...
-    R, n, m)
-
-% Условие: Радиус связи не меньше расстояния между станциями
-% 
-% Обеспечить:
-% 
-% Zijkq(Rjq 0 (ak - ai) >= 0 k = i + 1 : n + 1.
-% 
-
-tableVarName = table.Properties.VariableNames;
-RowNames = {};
-A = [];
-place = [0, place, place_end];
-
-for i = 1 : n
-    for j = 1 : m
-        for k = i + 1 : n + 1
-            if k == n + 1
-                var_z = ['z', num2str(i), '_', num2str(j), '_', ...
-                num2str(k), '_', num2str(m+1)];
-
-                RowNames = [RowNames, ['-z', num2str(i), num2str(j), ...
-                num2str(k),num2str(m+1) '(R', num2str(j), '_',...
-                num2str(m+1), '-(a', num2str(k), ...
-                '-a', num2str(i), '))']];
-
-                [~, row_z, ~] = intersect(tableVarName, var_z);
-
-                mas = zeros(1, width(table));
-                mas(1, row_z) = -(R(j,m+1) - (place(k+1) - place(i+1)));
-                A = [A; mas];
-                
-            else
-                for q = 1 : m
-                    if j ~= q
-                        var_z = ['z', num2str(i), '_', num2str(j), '_', ...
-                        num2str(k), '_', num2str(q)];
-                    
-                        RowNames = [RowNames, ['-z', num2str(i), num2str(j), ...
-                        num2str(k),num2str(q) '(R', num2str(j), '_',...
-                        num2str(q), '-(a', num2str(k), ...
-                        '-a', num2str(i), '))']];
-                    
-                        [~, row_z, ~] = intersect(tableVarName, var_z);
-                    
-                        mas = zeros(1, width(table));
-                        mas(1, row_z) = -(R(j,q) - (place(k+1) - place(i+1)));
-                        A = [A; mas];
-                        
-                    end
-                end
-            end
-        end
-    end
-end
-
-A_24 = array2table(A,'VariableNames', tableVarName);
-A_24.Properties.RowNames = RowNames;
-b_24 = zeros(height(A_24),1);
-end
-
-function [A_7h, b_7h] = add_condition_7hatch(table, n, m)
-tableVarName = table.Properties.VariableNames;
-RowNames = cell(1,m);
-var_x = cell(m, n);
-A = zeros(m, width(table));
-b_7h = zeros(m, 1);
-for j = 1 : m
-    for i = 1 : n
-        var_x{j,i} = ['x', num2str(i), num2str(j)];
-    end
-    [~, row_x, ~] = intersect(tableVarName, var_x(j,:));
-    A(j, row_x) = 1;
-    b_7h(j, 1) = 1;
-    RowNames{1,j} = ['SUMxi', num2str(j), '=1'];
-end
-
-A_7h = array2table(A,'VariableNames', tableVarName);
-A_7h.Properties.RowNames = RowNames;
-end
-
-function [A_12, b_12] = add_condition_12(table, n)
-tableVarName = table.Properties.VariableNames;
-A = [];
-RowNames = {};
-
-mas = zeros(1, width(table));
-var_y = ['y', num2str(0), 'plus'];
-[~, row_y, ~] = intersect(tableVarName, var_y);
-mas(1, row_y) = 1;
-A = [A; mas];
-
-mas = zeros(1, width(table));
-var_y = ['y', num2str(0), 'minus'];
-[~, row_y, ~] = intersect(tableVarName, var_y);
-mas(1, row_y) = 1;
-A = [A; mas];
-
-mas = zeros(1, width(table));
-var_y = ['y', num2str(n + 1), 'plus'];
-[~, row_y, ~] = intersect(tableVarName, var_y);
-mas(1, row_y) = 1;
-A = [A; mas];
-
-mas = zeros(1, width(table));
-var_y = ['y', num2str(n + 1), 'minus'];
-[~, row_y, ~] = intersect(tableVarName, var_y);
-mas(1, row_y) = 1;
-A = [A; mas];
-
-
-mas = zeros(1, width(table));
-var_e = ['e', num2str(0)];
-[~, row_e, ~] = intersect(tableVarName, var_e);
-mas(1, row_e) = 1;
-A = [A; mas];
-
-mas = zeros(1, width(table));
-var_e = ['e', num2str(n + 1)];
-[~, row_e, ~] = intersect(tableVarName, var_e);
-mas(1, row_e) = 1;
-A = [A; mas];
-
-A_12 = array2table(A,'VariableNames', tableVarName);
-A_12.Properties.RowNames = RowNames;
-b_12 = [zeros(4,1); ones(2,1)];
-end
-
-function [A_13, b_13] = add_condition_13(table, n, m, c, cost_limit)
+function [A_13, b_13] = cost_condition(table, n, m, c, cost_limit)
 tableVarName = table.Properties.VariableNames;
 RowNames = {'SUMxij is less than Cost Limit'};
 var_x = cell(m, n);
@@ -986,7 +350,6 @@ end
 A_13 = array2table(A,'VariableNames', tableVarName);
 A_13.Properties.RowNames = RowNames;
 end
-
 
 function Cost = calculate_constraints(solution, xname, ...
     cost_ineq)
