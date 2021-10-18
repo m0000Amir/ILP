@@ -20,7 +20,7 @@
             "Ptr":15,
             "Gtr":2
         },
-        "cost_limit": 45,
+        "cost_limit": 22,
         "sta": {
             "1": {
                 "Ptr_link": 20,
