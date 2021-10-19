@@ -1,8 +1,8 @@
-function get_placement()
+function get_all_sta_placement_problem()
 clear;
 addpath('./pathloss/')
 
-fname = 'input/input_test.json'; 
+fname = 'input/input_all_sta_placemet_problem.json'; 
 fid = fopen(fname); 
 raw = fread(fid,inf); 
 str = char(raw'); 
@@ -50,7 +50,7 @@ end
 
 output_MILP = {};
 
-[print_solution, solution, Xname, xInt, fInt] = ILP_problem_coverage_link_cost(cost_limit, ...
+[print_solution, solution, Xname, xInt, fInt] = ILP_cost(cost_limit, ...
     l, l_end, r, R, c);
 VarName = solution.Properties.VariableNames;
 if ~isempty(xInt)

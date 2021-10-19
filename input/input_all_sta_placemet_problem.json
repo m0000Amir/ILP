@@ -1,0 +1,65 @@
+{"placement": [
+            100,
+            155,
+            250,
+            300,
+            400,
+            450
+        ],
+        "gateway_placement": [
+            0,
+            550
+        ],
+        "gateway": {
+            "Ptr": 20,
+            "Gtr": 5,
+            "Ltr": 1,
+            "Precv": -69,
+            "Grecv": 5,
+            "Lrecv": 1
+        },
+        "frequency": 2437,
+        "user_device": {
+            "Ptr":15,
+            "Gtr":2
+        },
+        "cost_limit": 65,
+        "sta": {
+            "1": {
+                "Ptr_link": 20,
+                "Gtr_link": 5,
+                "Precv_link": -69,
+                "Grecv_link": 5,
+                "Precv_coverage": -67,
+                "Grecv_coverage": 5,
+                "c": 40
+            },
+            "2": {
+                "Ptr_link": 19,
+                "Gtr_link": 5,
+                "Precv_link": -67,
+                "Grecv_link": 5,
+                "Precv_coverage": -67,
+                "Grecv_coverage": 5,
+                "c": 1
+            },
+            "4": {
+                "Ptr_link": 19,
+                "Gtr_link": 5,
+                "Precv_link": -69,
+                "Grecv_link": 5,
+                "Precv_coverage": -67,
+                "Grecv_coverage": 6,
+                "c": 22
+            },
+            "5": {
+                "Ptr_link": 19,
+                "Gtr_link": 5,
+                "Precv_link": -69,
+                "Grecv_link": 5,
+                "Precv_coverage": -67,
+                "Grecv_coverage": 6,
+                "c": 22
+            }
+        }
+}
