@@ -28,16 +28,15 @@ Precv_link = [];
 Precv_coverage = [];
 Grecv_coverage = [];
 c = [];
-fn = fieldnames(json_data.sta);
-for k = 1:numel(fn)
-    Ptr_link = [Ptr_link; json_data.sta.(fn{k}).Ptr_link];
-    Gtr_link = [Gtr_link; json_data.sta.(fn{k}).Gtr_link];
-    Precv_link = [Precv_link; json_data.sta.(fn{k}).Precv_link];
+for k = 1: length(json_data.sta)
+    Ptr_link = [Ptr_link; json_data.sta(k).Ptr_link];
+    Gtr_link = [Gtr_link; json_data.sta(k).Gtr_link];
+    Precv_link = [Precv_link; json_data.sta(k).Precv_link];
     % coverage
-    Precv_coverage = [Precv_coverage; json_data.sta.(fn{k}).Precv_coverage];
+    Precv_coverage = [Precv_coverage; json_data.sta(k).Precv_coverage];
 
-    Grecv_coverage = [Grecv_coverage; json_data.sta.(fn{k}).Grecv_coverage];
-    c = [c; json_data.sta.(fn{k}).c];
+    Grecv_coverage = [Grecv_coverage; json_data.sta(k).Grecv_coverage];
+    c = [c; json_data.sta(k).c];
 end
 
 [R, r] = get_sta_value(Ptr_link, Gtr_link, Precv_link, ...

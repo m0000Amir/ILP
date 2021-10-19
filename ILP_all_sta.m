@@ -1,5 +1,5 @@
  function [print_solution, solution, Xname, xInt, fInt] = ILP_all_sta(...
-     cost_limit, l, l_end, r, R, c)
+     l, l_end, r, R)
 
 tic
 addpath('./coverage_condition/')
@@ -98,7 +98,7 @@ m = length(r);
 % =========================================================================
 %% Cost limit condition
 %% -- INEQUALITY
-[A_16, b_16] = placed_all_sta_condition(T, n, m, c, cost_limit);
+[A_16, b_16] = placed_all_sta_condition(T, n, m);
 
 % =========================================================================
 %% Matrix preparation
@@ -277,7 +277,7 @@ table.Properties.VariableNames = VarName;
 table.Properties.RowNames = {'f'};
 end
 
-function [A, b] = placed_all_sta_condition(table, n, m, c, cost_limit)
+function [A, b] = placed_all_sta_condition(table, n, m)
 tableVarName = table.Properties.VariableNames;
 RowNames = {'SUMxij is less than Cost Limit'};
 var_x = cell(m, n);

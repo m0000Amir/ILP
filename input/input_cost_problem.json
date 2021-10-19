@@ -24,8 +24,8 @@
             "Gtr":2
         },
         "cost_limit": 140,
-        "sta": {
-            "1": {
+        "sta": [
+            {
                 "Ptr_link": 20,
                 "Gtr_link": 5,
                 "Precv_link": -69,
@@ -34,7 +34,7 @@
                 "Grecv_coverage": 5,
                 "c": 40
             },
-            "2": {
+            {
                 "Ptr_link": 19,
                 "Gtr_link": 5,
                 "Precv_link": -67,
@@ -43,7 +43,7 @@
                 "Grecv_coverage": 5,
                 "c": 1
             },
-            "4": {
+            {
                 "Ptr_link": 19,
                 "Gtr_link": 5,
                 "Precv_link": -69,
@@ -52,5 +52,5 @@
                 "Grecv_coverage": 6,
                 "c": 22
             }
-        }
+        ]
 }
