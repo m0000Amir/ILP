@@ -50,7 +50,7 @@ end
 
 output_MILP = {};
 
-[print_solution, solution, Xname, xInt, fInt] = ILP_cost(cost_limit, ...
+[print_solution, solution, Xname, xInt, fInt] = ILP_all_sta(cost_limit, ...
     l, l_end, r, R, c);
 VarName = solution.Properties.VariableNames;
 if ~isempty(xInt)

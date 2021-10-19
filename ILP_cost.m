@@ -18,23 +18,22 @@ m = length(r);
 %% -- EQUALITY
 
 % В точке может быть размещена только одна точка
-% $e_i = \sum\limits_{j=1}^m x_{ij}$
-[A_1, b_2] = point_is_include_sta(T, n, m);
+[A_1, b_1] = point_is_include_sta(T, n, m);
 
 
 %% -- INEQUALITY
 
 % Каждая станция должна быть размещена только в одной точке.
-[A_3, b_3] = sta_must_be_placed_in_only_one_point(T, n, m);
+[A_2, b_2] = sta_must_be_placed_in_only_one_point(T, n, m);
 
 
 %% -- INEQUALITY
 
 % Значения покрытий не превышают радиус покрытия станции, размещенной в 
 % точке $a_i$, и равны 0, если в точке $a_i$  нет станции
-[A_4, b_4] = sta_coverage_is_no_more_than_coverage_radius(...
+[A_3, b_3] = sta_coverage_is_no_more_than_coverage_radius(...
     T, r, 'plus', n, m);
-[A_5, b_5] = sta_coverage_is_no_more_than_coverage_radius(...
+[A_4, b_4] = sta_coverage_is_no_more_than_coverage_radius(...
     T, r, 'minus', n, m);
 
 
@@ -42,13 +41,13 @@ m = length(r);
 
 % Общая область покрытия между любыми двумя точками $a_i$ и $a_k$, где 
 % расположены станции, не может превышать расстояние между этими точками.
-[A_6, b_6] = coverage_sum_between_sta(T, l, l_end, n, 'a');
-[A_7, b_7] = coverage_sum_between_sta(T, l, l_end, n, 'b');
+[A_5, b_5] = coverage_sum_between_sta(T, l, l_end, n, 'a');
+[A_6, b_6] = coverage_sum_between_sta(T, l, l_end, n, 'b');
 
 
 %% -- EQUALITY
 
-[A_8, b_8] = gateway_condition(T, n);
+[A_7, b_7] = gateway_condition(T, n);
 
 % =========================================================================
 %% Conditions of links between placed stations
@@ -56,8 +55,8 @@ m = length(r);
 %% -- INEQUALITY
 
 % Станции должны быть размещены в обеих точках $a_i$ и $a_k$
-[A_9, b_9] = sta_must_be_placed_to_link(T, n, m, 'a'); 
-[A_10, b_10] = sta_must_be_placed_to_link(T, n, m, 'b'); 
+[A_8, b_8] = sta_must_be_placed_to_link(T, n, m, 'a'); 
+[A_9, b_9] = sta_must_be_placed_to_link(T, n, m, 'b'); 
 
 
 %% -- EQUALITY
@@ -65,14 +64,14 @@ m = length(r);
 % Необходимо, чтобы станция $s_j$ в точке $a_i$ была связана с  любой 
 % станцией, расположенной в точке $a_k$, справа от $a_i$ ($ k>i $) или 
 % с правым шлюзом $s_{m + 1}$
-[A_11, b_11] = sta_is_connected_with_right_sta(T, n, m); % N10a
+[A_10, b_10] = sta_is_connected_with_right_sta(T, n, m); % N10a
 
 
 %% -- EQUALITY
 
 % Необходимо, чтобы любая станция $s_q$ в точке $a_k$ справа или правый 
 % шлюз $s_{m + 1}$ была связана с со станцией $s_j$ в точке $a_i$ ($k>i$) 
-[A_12, b_12] = right_sta_is_also_connected_with_sta(T, n, m); 
+[A_11, b_11] = right_sta_is_also_connected_with_sta(T, n, m); 
 
 
 %% -- EQUALITY
@@ -80,26 +79,26 @@ m = length(r);
 % Также станция $s_j$ в точке $a_i$ должна быть связана с любой станцией, 
 % расположенной в точке $a_k$ слева от точки $a_i$ ($k<i$) или с левым 
 % шлюзом $s_{m + 1}$
-[A_13, b_13] = sta_is_connected_with_left_sta(T, n, m);
+[A_12, b_12] = sta_is_connected_with_left_sta(T, n, m);
 
 
 %% -- EQUALITY
 % Также любая станция $s_q$ в точке $a_k$ слева или левый шлюз $s_{m + 1}$
 % должна быть связана со станцией  $s_j$ в точке $a_i$ ($k<i$)
-[A_14, b_14] = left_sta_is_also_connectd_with_sta(T, n, m); 
+[A_13, b_13] = left_sta_is_also_connectd_with_sta(T, n, m); 
 
 
 %% -- INEQUALITY
 %  Если станции $s_j$ и $s_q$ связаны, то максимальноый радиус связи 
 %  размещенных станций должен быть не меньше расстояния между точками 
 %  $a_i$ и $a_k$, где расположены станции $s_i$ и $s_q$
-[A_15, b_15] = link_to_the_left_sta(T, l, l_end, R, n, m);
-[A_16, b_16] = link_to_the_right_sta(T, l, l_end, R, n, m);
+[A_14, b_14] = link_to_the_left_sta(T, l, l_end, R, n, m);
+[A_15, b_15] = link_to_the_right_sta(T, l, l_end, R, n, m);
 
 % =========================================================================
 %% Cost limit condition
 %% -- INEQUALITY
-[A_17, b_17] = cost_condition(T, n, m, c, cost_limit);
+[A_16, b_16] = cost_condition(T, n, m, c, cost_limit);
 
 % =========================================================================
 %% Matrix preparation
@@ -110,17 +109,17 @@ intcon = 1: length(f);
 
 %% CONSTRAINTS
 % linear inequality constraints.
-total_A = [A_3; A_4; A_5; A_6; A_7; A_9; A_10; ...
-     A_15; A_16; A_17; ];
+total_A = [A_2; A_3; A_4; A_5; A_6; A_8; A_9; ...
+     A_14; A_15; A_16; ];
 A = table2array(total_A);
 
-b = [b_3; b_4; b_5; b_6; b_7; b_9; b_10; ...
-     b_15; b_16; b_17;]; 
+b = [b_2; b_3; b_4; b_5; b_6; b_8; b_9; ...
+     b_14; b_15; b_16;]; 
 
 % % linear equality constraints.
-total_Aeq = [A_1; A_8; A_11;  A_12; A_13; A_14];
+total_Aeq = [A_1; A_7; A_10;  A_11; A_12; A_13];
 Aeq = table2array(total_Aeq);
-beq = [b_2; b_8;  b_11;  b_12; b_13; b_14];
+beq = [b_1; b_7;  b_10;  b_11; b_12; b_13];
 
 % =========================================================================
 %% BOUNDS
@@ -176,7 +175,7 @@ t = toc
 % =========================================================================
 %% Print Solution
 Cost_estimate = calculate_constraints(solution, Xname, ...
-    A_17);
+    A_16);
 Placed_stations = get_placed_sta(solution, Xname, n, m);
 % Placed_stations
 print_solution = ['Placed stations = [', num2str(Placed_stations),']', ...
@@ -278,12 +277,12 @@ table.Properties.VariableNames = VarName;
 table.Properties.RowNames = {'f'};
 end
 
-function [A_13, b_13] = cost_condition(table, n, m, c, cost_limit)
+function [A, b] = cost_condition(table, n, m, c, cost_limit)
 tableVarName = table.Properties.VariableNames;
 RowNames = {'SUMxij is less than Cost Limit'};
 var_x = cell(m, n);
 A = zeros(1, width(table));
-b_13 = cost_limit;
+b = cost_limit;
 
 for j = 1 : m
     for i = 1 : n
@@ -293,8 +292,8 @@ for j = 1 : m
     A(1, row_x) = c(j);
 end
 
-A_13 = array2table(A,'VariableNames', tableVarName);
-A_13.Properties.RowNames = RowNames;
+A = array2table(A,'VariableNames', tableVarName);
+A.Properties.RowNames = RowNames;
 end
 
 function Cost = calculate_constraints(solution, xname, ...
