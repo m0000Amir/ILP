@@ -52,7 +52,6 @@ output_MILP = {};
 
 [print_solution, solution, Xname, xInt, fInt] = ILP_problem_coverage_link_cost(cost_limit, ...
     l, l_end, r, R, c);
-%     xIntSol = table2array(solution);
 VarName = solution.Properties.VariableNames;
 if ~isempty(xInt)
     solution = array2table(xInt');
@@ -93,9 +92,9 @@ for k = 1 : height(solution)
             index = index + 1;
         end
     end
-    output_data(k).frequency = frequency'
+    output_data(k).frequency = frequency';
     output_data(k).Grecv_gateway = Grecv_gateway;
-    output_data(k).Precv_gateway = Precv_gateway
+    output_data(k).Precv_gateway = Precv_gateway;
     output_data(k).gateway_coordinate = l_end;
     if isempty(fInt) 
         output_data(k).f = -1 * fval;

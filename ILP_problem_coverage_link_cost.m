@@ -169,56 +169,35 @@ ub(row_Yname(1: end-2)) = inf;
 
 % =========================================================================
 %% Solution
-options = optimoptions(@intlinprog,'OutputFcn',@savemilpsolutions1);
-[x,fval] = intlinprog(f,intcon,A,b,Aeq,beq,lb,ub, options);
+options = optimoptions(@intlinprog,'OutputFcn',@savem_feasible_solutions);
+[x, fval] = intlinprog(f,intcon,A,b,Aeq,beq,lb,ub, options);
 
-    function stop = savemilpsolutions1(x,optimValues,state,varargin)
+    function stop = savem_feasible_solutions(x,optimValues,state,varargin)
         %SAVEMILPSOLUTIONS save all the integer solution found by 
         %intlinprog.
-        %   All the unique solutions are created as variables 
-        %  (xIntSol, fIntSol) in the base workspace.
-        %
-        %   See also intlinprog
-
-        %   Copyright 2014 The MathWorks, Inc.
 
         % No reason to stop the solver from this function.
         stop = false;
-        xIntSol = [];
+
         switch (state)
           case 'init'
             % Create new (or reset) variables in the base workspace  
-            % to collect integer solution.
-            %  assignin('base','xIntSol',[])
-            %  assignin('base','fIntSol',[])
-            xInt = []
-            fInt = []
+            xInt = [];
+            fInt = [];
           case 'iter'
             % 'x' is not empty only when there is a new integer solution 
             % found during branch and bound phase.
             if ~isempty(x)
-              % Save integer x by appending new columns in 
-              % the matrix xIntSol
-%               xInts = evalin('base','xIntSol');
-%               xInts = [xInts, x(:)];
-                
-%               % Save fval for integer x by appending to the vector fIntSol
-%               fval = optimValues.fval;
-%               fInts = evalin('base','fIntSol');
-%               fInts = [fInts, fval];
-% 
-%               % Update the variables
-%               assignin('base','fIntSol',fInts)      
-%               assignin('base','xIntSol',xInts)
-%               xIntSol = [xIntSol, x(:)];
+              % Save integer xInt and fval
                 fval = optimValues.fval;
                 xInt = [xInt, x(:)];
-                fInt = [fInt, fval];
+                fInt = [fInt, optimValues.fval];
             end
           case 'done'
             % Nothing to do here.
         end
     end
+
 solution = array2table(x');
 solution.Properties.VariableNames = total_AVarName;
 
@@ -233,9 +212,6 @@ Placed_stations = get_placed_sta(solution, Xname, n, m);
 print_solution = ['Placed stations = [', num2str(Placed_stations),']', ...
     ' ; Total coverage = ', num2str(-fval), ' ; Cost = ', ...
     num2str(Cost_estimate)];
-if height(solution) == 1
-    fInt = [fval];
-end
 
 end
 
