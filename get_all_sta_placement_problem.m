@@ -2,7 +2,7 @@ function get_all_sta_placement_problem()
 clear;
 addpath('./pathloss/')
 
-fname = 'input/comparation.json'; 
+fname = 'input/comparation_debug.json'; 
 fid = fopen(fname); 
 raw = fread(fid,inf); 
 str = char(raw'); 

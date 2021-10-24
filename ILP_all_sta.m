@@ -110,16 +110,16 @@ intcon = 1: length(f);
 %% CONSTRAINTS
 % linear inequality constraints.
 total_A = [A_2; A_3; A_4; A_5; A_6; A_8; A_9; ...
-     A_14; A_15; A_16; ];
+     A_14; A_15 ];
 A = table2array(total_A);
 
 b = [b_2; b_3; b_4; b_5; b_6; b_8; b_9; ...
-     b_14; b_15; b_16;]; 
+     b_14; b_15 ]; 
 
 % % linear equality constraints.
-total_Aeq = [A_1; A_7; A_10;  A_11; A_12; A_13];
+total_Aeq = [A_1; A_7; A_10;  A_11; A_12; A_13; A_16];
 Aeq = table2array(total_Aeq);
-beq = [b_1; b_7;  b_10;  b_11; b_12; b_13];
+beq = [b_1; b_7;  b_10;  b_11; b_12; b_13; b_16;];
 
 % =========================================================================
 %% BOUNDS
