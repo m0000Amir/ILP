@@ -31,5 +31,5 @@ Lfs = Ptr - Ltr + Gtr + Grecv - Lrecv - Precv - SOM;
 
 % DISTANCE
 
-d = ceil(10^((Lfs - 20*log10(F) - K)/20));
+d = round(10^((Lfs - 20*log10(F) - K)/20));
 end
