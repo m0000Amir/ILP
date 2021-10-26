@@ -20,7 +20,7 @@ for i = 1 : n
     [~, row_y, ~] = intersect(tableVarName, var_y);
     A(i, row_y) = 1;
     for j = 1 : m
-        var_x = ['x', num2str(i), num2str(j)];
+        var_x = ['x', num2str(i), '_',num2str(j)];
         [~, row_x, ~] = intersect(tableVarName,var_x);
     A(i, row_x) = -1 * r(j);
     end

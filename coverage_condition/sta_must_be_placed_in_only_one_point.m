@@ -13,7 +13,7 @@ A = zeros(m, width(table));
 b = zeros(m, 1);
 for j = 1 : m
     for i = 1 : n
-        var_x{j,i} = ['x', num2str(i), num2str(j)];
+        var_x{j,i} = ['x', num2str(i), '_', num2str(j)];
     end
     [~, row_x, ~] = intersect(tableVarName, var_x(j,:));
     A(j, row_x) = 1;

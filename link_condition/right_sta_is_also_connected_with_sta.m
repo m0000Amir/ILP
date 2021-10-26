@@ -12,7 +12,7 @@ for k = 1 : n
     for q = 1 : m
         mas = zeros(1, width(table));
         var_z = {};
-        var_x = ['x', num2str(k), num2str(q)];
+        var_x = ['x', num2str(k), '_',num2str(q)];
         [~, row_x, ~] = intersect(tableVarName, var_x);
         mas(1, row_x) = 1;
         for i = k + 1 : n + 1
@@ -38,10 +38,10 @@ for k = 1 : n
         [~, row_z, ~] = intersect(tableVarName, var_z);
         mas(1, row_z) = -1;
         if k == 0 || k == n + 1
-            RowNames = [RowNames, ['x', num2str(k), num2str(m+1), ...
+            RowNames = [RowNames, ['x', num2str(k), '_',num2str(m+1), ...
                 '-SUMzijkq']];
         else
-            RowNames = [RowNames, ['x', num2str(k), num2str(q), ...
+            RowNames = [RowNames, ['x', num2str(k), '_',num2str(q), ...
                 '-SUMzijkq']];
         end
         A = [A; mas];       

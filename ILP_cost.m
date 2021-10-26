@@ -85,7 +85,7 @@ m = length(r);
 %% -- EQUALITY
 % Также любая станция $s_q$ в точке $a_k$ слева или левый шлюз $s_{m + 1}$
 % должна быть связана со станцией  $s_j$ в точке $a_i$ ($k<i$)
-[A_13, b_13] = left_sta_is_also_connectd_with_sta(T, n, m); 
+[A_13, b_13] = left_sta_is_also_connected_with_sta(T, n, m); 
 
 
 %% -- INEQUALITY
@@ -176,7 +176,7 @@ t = toc
 %% Print Solution
 Cost_estimate = calculate_constraints(solution, Xname, ...
     A_16);
-Placed_stations = get_placed_sta(solution, Xname, n, m);
+Placed_stations = print_stations_placement(solution, n, m);
 % Placed_stations
 print_solution = ['Placed stations = [', num2str(Placed_stations),']', ...
     ' ; Total coverage = ', num2str(-fval), ' ; Cost = ', ...
@@ -203,7 +203,7 @@ Xname = strings(1, length(i)*length(j));
 index = 1;
 for i = 1 : n 
     for j = 1 : m
-        Xname(index) = ['x', num2str(i), num2str(j)];
+        Xname(index) = ['x', num2str(i), '_', num2str(j)];
         index = index + 1;
     end
 end
@@ -286,7 +286,7 @@ b = cost_limit;
 
 for j = 1 : m
     for i = 1 : n
-        var_x{j,i} = ['x', num2str(i), num2str(j)];
+        var_x{j,i} = ['x', num2str(i), '_', num2str(j)];
     end
     [~, row_x, ~] = intersect(tableVarName, var_x(j,:));
     A(1, row_x) = c(j);
@@ -307,26 +307,3 @@ function Cost = calculate_constraints(solution, xname, ...
     Cost = sum(cost_array .* solution_array);
 end
 
-function [Placed] = get_placed_sta(solution, xname, n, m)
-    Placed = ones(1, n)*inf;
-    
-    solution_name = solution.Properties.VariableNames;
-    [~, row_x, ~] = intersect(solution_name, xname);
-    p = zeros(1, n*m);
-    s = zeros(1, n*m);
-    solution_x = table2array(solution(1, row_x));
-    index = 1;
-
-    for i = 1 : n
-        for j = 1 : m
-            p(index) = i;
-            s(index) = j;
-            
-            
-            if int8(solution_x(index)) == 1
-                Placed(i) = j;
-            end
-            index = index + 1;
-        end
-    end
-end

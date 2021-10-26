@@ -19,12 +19,15 @@ Grecv_gateway = json_data.gateway.Grecv;
 
 Ptr_ud = json_data.user_device.Ptr;
 Gtr_ud = json_data.user_device.Gtr;
+Ltr_ud = json_data.user_device.Ltr;
 
 frequency = json_data.frequency;
 
 Ptr_link = [];
 Gtr_link = [];
 Precv_link = [];
+L_link = [];
+L_coverage = [];
 Precv_coverage = [];
 Grecv_coverage = [];
 c = [];
@@ -32,17 +35,19 @@ for k = 1: length(json_data.sta)
     Ptr_link = [Ptr_link; json_data.sta(k).Ptr_link];
     Gtr_link = [Gtr_link; json_data.sta(k).Gtr_link];
     Precv_link = [Precv_link; json_data.sta(k).Precv_link];
+    L_link = [L_link; json_data.sta(k).L_link];
     % coverage
     Precv_coverage = [Precv_coverage; json_data.sta(k).Precv_coverage];
 
     Grecv_coverage = [Grecv_coverage; json_data.sta(k).Grecv_coverage];
+    L_coverage = [L_coverage; json_data.sta(k).L_coverage];
     c = [c; json_data.sta(k).c];
 end
 
 [R, r] = get_sta_value(Ptr_link, Gtr_link, Precv_link, ...
-    Precv_coverage, Grecv_coverage, ...
-    Precv_gateway, Grecv_gateway, frequency, ...
-    Ptr_ud, Gtr_ud);
+    L_link, L_coverage, Precv_coverage, Grecv_coverage, ...
+    Precv_gateway, Grecv_gateway, Lrecv_gateway, frequency, ...
+    Ptr_ud, Gtr_ud, Ltr_ud);
 
 
 %% SOLUTION

@@ -1,7 +1,7 @@
- function [print_solution, solution, Xname, xInt, fInt] = ILP_all_sta(...
-     l, l_end, r, R)
+ function [print_solution, solution, Xname, xInt, fInt] = ILP_cost(...
+     cost_limit, l, l_end, r, R, c)
 
-
+tic
 addpath('./coverage_condition/')
 addpath('./link_condition/')
 
@@ -85,7 +85,7 @@ m = length(r);
 %% -- EQUALITY
 % Также любая станция $s_q$ в точке $a_k$ слева или левый шлюз $s_{m + 1}$
 % должна быть связана со станцией  $s_j$ в точке $a_i$ ($k<i$)
-[A_13, b_13] = left_sta_is_also_connected_with_sta(T, n, m); 
+[A_13, b_13] = left_sta_is_also_connectd_with_sta(T, n, m); 
 
 
 %% -- INEQUALITY
@@ -98,7 +98,7 @@ m = length(r);
 % =========================================================================
 %% Cost limit condition
 %% -- INEQUALITY
-[A_16, b_16] = placed_all_sta_condition(T, n, m);
+[A_16, b_16] = cost_condition(T, n, m, c, cost_limit);
 
 % =========================================================================
 %% Matrix preparation
@@ -110,16 +110,16 @@ intcon = 1: length(f);
 %% CONSTRAINTS
 % linear inequality constraints.
 total_A = [A_2; A_3; A_4; A_5; A_6; A_8; A_9; ...
-     A_14; A_15 ];
+     A_14; A_15; A_16; ];
 A = table2array(total_A);
 
 b = [b_2; b_3; b_4; b_5; b_6; b_8; b_9; ...
-     b_14; b_15 ]; 
+     b_14; b_15; b_16;]; 
 
 % % linear equality constraints.
-total_Aeq = [A_1; A_7; A_10;  A_11; A_12; A_13; A_16];
+total_Aeq = [A_1; A_7; A_10;  A_11; A_12; A_13];
 Aeq = table2array(total_Aeq);
-beq = [b_1; b_7;  b_10;  b_11; b_12; b_13; b_16;];
+beq = [b_1; b_7;  b_10;  b_11; b_12; b_13];
 
 % =========================================================================
 %% BOUNDS
@@ -138,9 +138,8 @@ ub(row_Yname(1: end-2)) = inf;
 
 % =========================================================================
 %% Solution
-tic
 options = optimoptions(@intlinprog,'OutputFcn',@savem_feasible_solutions);
-[x, fval, exitflag, output] = intlinprog(f,intcon,A,b,Aeq,beq,lb,ub, options);
+[x, fval] = intlinprog(f,intcon,A,b,Aeq,beq,lb,ub, options);
 
     function stop = savem_feasible_solutions(x,optimValues,state,varargin)
         %SAVEMILPSOLUTIONS save all the integer solution found by 
@@ -177,12 +176,12 @@ t = toc
 %% Print Solution
 Cost_estimate = calculate_constraints(solution, Xname, ...
     A_16);
-Placed_stations = print_stations_placement(solution, n, m);
+Placed_stations = get_placed_sta(solution, Xname, n, m);
 % Placed_stations
 print_solution = ['Placed stations = [', num2str(Placed_stations),']', ...
     ' ; Total coverage = ', num2str(-fval), ' ; Cost = ', ...
     num2str(Cost_estimate)];
-Num_nodes = output.numnodes
+
 end
 
 function [table, Yname, Xname] = objective_funcion(place, n, m)
@@ -204,7 +203,7 @@ Xname = strings(1, length(i)*length(j));
 index = 1;
 for i = 1 : n 
     for j = 1 : m
-        Xname(index) = ['x', num2str(i), '_', num2str(j)];
+        Xname(index) = ['x', num2str(i), num2str(j)];
         index = index + 1;
     end
 end
@@ -278,19 +277,19 @@ table.Properties.VariableNames = VarName;
 table.Properties.RowNames = {'f'};
 end
 
-function [A, b] = placed_all_sta_condition(table, n, m)
+function [A, b] = cost_condition(table, n, m, c, cost_limit)
 tableVarName = table.Properties.VariableNames;
 RowNames = {'SUMxij is less than Cost Limit'};
 var_x = cell(m, n);
 A = zeros(1, width(table));
-b = m;
+b = cost_limit;
 
 for j = 1 : m
     for i = 1 : n
         var_x{j,i} = ['x', num2str(i), '_', num2str(j)];
     end
     [~, row_x, ~] = intersect(tableVarName, var_x(j,:));
-    A(1, row_x) = 1;
+    A(1, row_x) = c(j);
 end
 
 A = array2table(A,'VariableNames', tableVarName);
@@ -311,12 +310,23 @@ end
 function [Placed] = get_placed_sta(solution, xname, n, m)
     Placed = ones(1, n)*inf;
     
+    solution_name = solution.Properties.VariableNames;
+    [~, row_x, ~] = intersect(solution_name, xname);
+    p = zeros(1, n*m);
+    s = zeros(1, n*m);
+    solution_x = table2array(solution(1, row_x));
+    index = 1;
+
     for i = 1 : n
-        for j = 1 : m            
-            var_x = ['x', num2str(i), '_', num2str(j)];
-            if int8(solution{1, var_x}) == 1
+        for j = 1 : m
+            p(index) = i;
+            s(index) = j;
+            
+            
+            if int8(solution_x(index)) == 1
                 Placed(i) = j;
             end
+            index = index + 1;
         end
     end
 end
