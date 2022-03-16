@@ -2,7 +2,10 @@ function get_placement_cost_problem()
 clear;
 addpath('./pathloss/')
 
-fname = 'input/input_cost_problem.json'; 
+% fname = 'input/input_cost_problem.json'; 
+% fname = 'input/input.json'; 
+fname = 'input/article_experience4_debug.json';
+
 fid = fopen(fname); 
 raw = fread(fid,inf); 
 str = char(raw'); 
@@ -13,6 +16,7 @@ l = json_data.placement';
 l_end = json_data.gateway_placement(2);
 cost_limit = json_data.cost_limit;
 
+Ptr_gateway = json_data.gateway.Ptr;
 Precv_gateway = json_data.gateway.Precv;
 Lrecv_gateway = json_data.gateway.Lrecv;
 Grecv_gateway = json_data.gateway.Grecv;
@@ -41,12 +45,12 @@ for k = 1: length(json_data.sta)
 
     Grecv_coverage = [Grecv_coverage; json_data.sta(k).Grecv_coverage];
     L_coverage = [L_coverage; json_data.sta(k).L_coverage];
-    c = [c; json_data.sta(k).c];
+    c = [c; json_data.sta(k).cost];
 end
 
 [R, r] = get_sta_value(Ptr_link, Gtr_link, Precv_link, ...
     L_link, L_coverage, Precv_coverage, Grecv_coverage, ...
-    Precv_gateway, Grecv_gateway, Lrecv_gateway, frequency, ...
+    Ptr_gateway, Precv_gateway, Grecv_gateway, Lrecv_gateway, frequency, ...
     Ptr_ud, Gtr_ud, Ltr_ud);
 
 

@@ -4,7 +4,7 @@
 %     Ptr_ud, Gtr_ud)
 function [R, r] = get_sta_value(Ptr_link, Gtr_link, Precv_link, ...
     L_link, L_coverage, Precv_coverage, Grecv_coverage, ...
-    Precv_gateway, Grecv_gateway, Lrecv_gateway, frequency, ...
+    Ptr_gateway, Precv_gateway, Grecv_gateway, Lrecv_gateway, frequency, ...
     Ptr_ud, Gtr_ud, Ltr_ud)
 % Get link distance station R(i,j)
 % and
@@ -58,14 +58,20 @@ for i = 1 : height(BS)
         BS.Precv_coverage(i), F, K);
 end
 R_sta2gateway = zeros(height(BS), 1);
+sta2gateway_R = zeros(height(BS), 1);
 
 for k = 1 : height(BS)
     R_sta2gateway(k, 1) = get_distance(BS.Ptr_link(k), BS.L_link(k), ...
         BS.Gtr_link(k, 1), Grecv_gateway, Lrecv_gateway, SOM, ...
         Precv_gateway, F, K);
+    
+    sta2gateway_R(k, 1) = get_distance(Ptr_gateway, Lrecv_gateway, ...
+        Grecv_gateway, BS.Gtr_link(k), BS.L_link(k), SOM, ...
+        BS.Precv_link(k), F, K);
 end
+
 R1 = [R_sta, R_sta2gateway];
-R2 = [R_sta2gateway', inf];
+R2 = [sta2gateway_R', inf];
 R = [R1; R2];
 r
 R
