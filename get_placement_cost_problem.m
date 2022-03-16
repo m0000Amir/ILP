@@ -79,15 +79,17 @@ for k = 1 : height(solution)
     s = zeros(1, n*m);
     solution_x = table2array(solution(k, row_x));
     index = 1;
-
+    cost = 0;
+    
     sta_num = 0;
-    for i = 1 : n
+    for i = 1 : n    
         for j = 1 : m
             p(index) = i;
             s(index) = j;
 
             if int8(solution_x(index)) == 1
                 Placed(i) = j;
+                cost = cost + c(j);
                 sta_num = sta_num + 1;
                 sta.coordinate = l(p(index)); 
                 sta.P_tr = Ptr_link(s(index));
@@ -101,9 +103,11 @@ for k = 1 : height(solution)
         end
     end
     output_data(k).frequency = frequency';
-    output_data(k).Grecv_gateway = Grecv_gateway;
-    output_data(k).Precv_gateway = Precv_gateway;
-    output_data(k).gateway_coordinate = l_end;
+    output_data(k).Placed = Placed;
+    output_data(k).Cost = cost;
+%     output_data(k).Grecv_gateway = Grecv_gateway;
+%     output_data(k).Precv_gateway = Precv_gateway;
+%     output_data(k).gateway_coordinate = l_end;
     if isempty(fInt) 
         output_data(k).f = -1 * fval;
     elseif (length(fInt)== 1)
